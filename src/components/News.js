@@ -8,14 +8,15 @@ const News = (props) => {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
-  const [api, setapi] = useState("8ddbea3cdafb4e0a82209d5978a1b9d9");
+  const apiKey = process.env.REACT_APP_NEWS_API_KEY;
+
   const capitalize = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1);
   };
 
   const updatenews = async () => {
     props.setprogress(10);
-    const url = `https://newsapi.org/v2/top-headlines?country=in&category=${props.category}&apiKey=${api}&page=${page}&pageSize=${props.pageSize}`;
+    const url = `https://newsapi.org/v2/top-headlines?country=in&category=${props.category}&apiKey=${apiKey}&page=${page}&pageSize=${props.pageSize}`;
     setLoading(true);
 
     try {
@@ -25,12 +26,8 @@ const News = (props) => {
       let parsedData = await data.json();
       props.setprogress(70);
       let mainArray = parsedData.articles;
-      let urlToImageArray = mainArray.filter((item) => {
-        return item.urlToImage;
-      });
-      let urlWithoutImage = mainArray.filter((item) => {
-        return item.urlToImage == null;
-      });
+      let urlToImageArray = mainArray.filter((item) => item.urlToImage);
+      let urlWithoutImage = mainArray.filter((item) => !item.urlToImage);
       mainArray = urlToImageArray.concat(urlWithoutImage);
       setArticles(mainArray || []);
       setTotalResults(parsedData.totalResults || 0);
@@ -45,7 +42,7 @@ const News = (props) => {
   const fetchData = async () => {
     const nextPage = page + 1;
     setPage(nextPage);
-    const url = `https://newsapi.org/v2/top-headlines?country=in&category=${props.category}&apiKey=${api}&page=${nextPage}&pageSize=${props.pageSize}`;
+    const url = `https://newsapi.org/v2/top-headlines?country=in&category=${props.category}&apiKey=${apiKey}&page=${nextPage}&pageSize=${props.pageSize}`;
 
     try {
       let data = await fetch(url);
